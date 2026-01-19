@@ -1,9 +1,13 @@
+from datetime import datetime
 import urllib.request
 import urllib.parse
 import urllib.error
 from bs4 import BeautifulSoup
 import time
-
+month=input("please input the month of the airline starting time in numbers")
+day=input("please input the day of the airline starting time")
+year=input("please input the year of the airline starting time")
+timestr1 = datetime(month,day,year)
 infolist=[]
 print("Please input your airline name")
 airlinename=input()
@@ -15,6 +19,57 @@ while True:
     with urllib.request.urlopen(url) as file:
         soup = BeautifulSoup(file, 'html.parser')
         timetag=soup.find("div", id="gametime")
+         if timetag:
+        timestr = timetag.get_text(strip=True)
+        # Format example: "Jan 15 2026"
+        month=timestr[0:3]
+        #convert month to number
+        if month=="Jan":
+            month="1"
+        if month=="Feb":
+            month="2"
+        if month=="Mar":
+            month="3"
+        if month=="Apr":
+            month="4"
+        if month=="May":
+            month="5"
+        if month=="Jun":
+            month="6"
+        if month=="Jul":
+            month="7"
+        if month=="Aug":
+            month="8"
+        if month=="Sep":
+            month="9"
+        if month=="Oct":
+            month="10"
+        if month=="Nov":
+            month="11"
+        if month=="Dec":
+            month="12"
+        day=timestr[4:6]
+        #remove the comma from the day
+        tempstr=""
+        for char in day:
+            if char!=",":
+                tempstr+=char
+        day=tempstr
+        #reverse the string to get the year at the end
+        timestr = timestr[::-1]
+        year=timestr[0:4]
+        #reverse the year string back to normal
+        year=year[::-1]
+        #reverse the timestr back to normal for printing
+        timestr=timestr[::-1]
+        print(month+"/"+day+"/"+year)
+        timestr2=datetime(int(year),int(month),int(day))
+        print(month+"/"+day+"/"+year)
+        diff = timestr2 - timestr1
+        print("days since the game started:", diff.days)
+    else:
+        print("Could not find game timestr")
+        continue
         #print(soup.prettify())
     #htmlstring=soup.prettify()
     #with open("htmltext.txt", "w", encoding="utf-8") as file:
@@ -37,8 +92,6 @@ while True:
                 # Stop if we hit an 'a' tag (next player)
                     if curr.name == "a":
                         break
-    
-    
     # Find the 6th <td> before given airline name
     target_td = None
     if text_node:
@@ -63,26 +116,26 @@ while True:
     with open("data.txt", "a", encoding="utf-8") as file:
         if timetag:
             file.write("Time: " + timetag.get_text(strip=True) + "\n")
-        
+            file.write("days since the game started: " + str(diff.days) + "\n")
         if target_td:
             file.write("rank:" + target_td.get_text(strip=True) + "\n")
         
         # Filtering empty strings and logos to get meaningful data
         clean_info = [x for x in infolist if x]
-        print(clean_info)
-        if len(clean_info) >= 3:
-            file.write("alliance: " + clean_info[0] + "\n")
-            file.write("destination number: " + clean_info[1] + "\n")
-            file.write("fleet number: " + clean_info[2] + "\n")
-            file.write("hub number: " + clean_info[3] + "\n")
-            file.write("daily flights : " + clean_info[4] + "\n")
-            file.write("daily paxs : " + clean_info[5] + "\n")
-            file.write("daily distance : " + clean_info[6] + "\n")
-            file.write("valuation : " + clean_info[7] + "\n")
-            file.flush()
-            file.close()
-    infolist=[]
-    cleandata=[]
-    print("waiting for next day")
-    time.sleep(int(daylength)*60)
+        if len(clean_info) >= 8:
+            labels = [
+                "alliance", "destination number", "fleet number",
+                "hub number", "daily flights", "daily paxs",
+                "daily distance", "valuation"
+            ]
+            for label, value in zip(labels, clean_info):
+                f.write(f"{label}: {value}\n")
+
+        f.write("\n")
+
+    print("Scraped info:", clean_info)
+    print("Sleeping...\n")
+
+    time.sleep(19.98 * 60)
+
     
