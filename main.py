@@ -66,7 +66,7 @@ while True:
         timestr2=datetime(int(year),int(month),int(day))
         print(month+"/"+day+"/"+year)
         diff = timestr2 - timestr1
-        print("days since the game started:", diff.days)
+        print("days since the game started:", diff.days+1)
     else:
         print("Could not find game timestr")
         continue
@@ -116,7 +116,7 @@ while True:
     with open("data.txt", "a", encoding="utf-8") as file:
         if timetag:
             file.write("Time: " + timetag.get_text(strip=True) + "\n")
-            file.write("days since the game started: " + str(diff.days) + "\n")
+            file.write("days since the game started: " + str(diff.days+1) + "\n")
         if target_td:
             file.write("rank:" + target_td.get_text(strip=True) + "\n")
         
